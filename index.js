@@ -18,7 +18,10 @@ initialize();
 
 const corsOption = {
   origin: "*",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  optionsSuccessStatus: 204,
 };
+app.options("*", cors(corsOption));
 app.use(cors(corsOption));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
