@@ -5,7 +5,7 @@ import { dbConnection } from "./utils/Db.js";
 import errorHandler from "./middlewares/errorHandler.js";
 import { initialize } from "./utils/Socket.js";
 import routes from "./routes/entry.js";
-// import cors from "cors";
+import cors from "cors";
 
 dotenv.config();
 
@@ -16,10 +16,10 @@ const port = process.env.port || 8080;
 const app = express();
 initialize();
 
-// const corsOption = {
-//   origin: "http://10.132.62.10:8081",
-// };
-// app.use(cors(corsOption));
+const corsOption = {
+  origin: "*",
+};
+app.use(cors(corsOption));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
