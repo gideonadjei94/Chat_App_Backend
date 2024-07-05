@@ -1,4 +1,4 @@
-import express, { urlencoded } from "express";
+import express from "express";
 import dotenv from "dotenv";
 import morgan from "morgan";
 import { dbConnection } from "./utils/Db.js";
