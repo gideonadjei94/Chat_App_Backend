@@ -3,7 +3,7 @@ import User from "../models/User.js";
 
 const router = express.Router();
 //to fetch userChats
-router.get("/get-chats/:userId", async (req, res) => {
+router.get("/getchats/:userId", async (req, res) => {
   const { userId } = req.params;
   const user = await User.findById(userId);
   try {
@@ -14,15 +14,18 @@ router.get("/get-chats/:userId", async (req, res) => {
           return {
             username: memberId.username,
             contact: memberId.contact,
+            member: memberId._id,
+            Id: c._id,
+            messages: c.messages,
           };
         }
         return null;
       })
     );
 
-    res.status(200).json({ userChats: chats });
+    res.status(200).json(chats);
   } catch (error) {
-    res.status(400).json(error);
+    res.status(400).json({ message: error });
   }
 });
 

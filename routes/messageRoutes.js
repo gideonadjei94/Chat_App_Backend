@@ -1,6 +1,7 @@
 import express from "express";
 import User from "../models/User.js";
 import mongoose from "mongoose";
+import { getIo } from "../utils/Socket.js";
 
 const router = express.Router();
 
@@ -23,11 +24,13 @@ router.post("/create/:senderId/:receiverId", async (req, res) => {
 
     const senderMessage = {
       receiverId: receiverObjectId,
+      senderId: senderObjectId,
       message: message,
       timestamp: new Date(),
     };
 
     const receiverMessage = {
+      receiverId: receiverObjectId,
       senderId: senderObjectId,
       message: message,
       timestamp: new Date(),
@@ -64,12 +67,30 @@ router.post("/create/:senderId/:receiverId", async (req, res) => {
     chatSender.messages.push(senderMessage);
     await sender.save();
 
-    res
-      .status(200)
-      .json({ status: true, message: "Message sent successfully" });
+    const io = getIo();
+    io.to(receiverId).emit("message", receiverMessage);
+
+    res.status(200).json(senderMessage);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ status: false, message: "Server error" });
+    res.status(500).json({ status: false, message: error.message });
+  }
+});
+
+router.get("/getmessages/:userId/:chatId", async (req, res) => {
+  const { userId, chatId } = req.params;
+  try {
+    //const senderObjectId = new mongoose.Types.ObjectId(userId);
+    const Id = new mongoose.Types.ObjectId(chatId);
+
+    const user = await User.findById(userId);
+    const chat = user.chats.find((chat) => chat._id && chat._id.equals(Id));
+    if (!chat) {
+      return res.status(404).json({ status: false, message: "Chat not found" });
+    }
+    res.status(200).json(chat.messages);
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
   }
 });
 

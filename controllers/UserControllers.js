@@ -19,6 +19,7 @@ export const registerUser = async (req, res) => {
         email,
         password,
         contact,
+        chats: { messages: [] },
       });
       await user.save();
       if (user) {
@@ -26,8 +27,7 @@ export const registerUser = async (req, res) => {
         user.password = undefined;
 
         res.status(201).json({
-          status: true,
-          message: "User Registered successfully",
+          user,
           token,
         });
       }
@@ -48,12 +48,12 @@ export const loginUser = async (req, res) => {
     const isValidPassword = await bcrypt.compare(password, user.password);
 
     if (!user || !isValidPassword) {
-      return res.status(400).json("Invalid email or password..");
+      return res.status(400).json("Invalid email or password..", error.message);
     } else {
       const token = createJwt(res, user._id);
-      return res.status(201).json({ message: "User logged in successfully.." });
+      return res.status(201).json(user);
     }
   } catch (error) {
-    res.status(400).json("An error occured " + error);
+    res.status(400).json("An error occured " + error.message);
   }
 };

@@ -8,6 +8,5 @@ router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.post("/addcontact/:userId", addContact);
 router.get("/contacts/:userId", getContacts);
-//router.post("/auth/google", googleAuth);
 
 export default router;
