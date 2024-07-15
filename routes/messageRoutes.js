@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.post("/create/:senderId/:receiverId", async (req, res) => {
   const { senderId, receiverId } = req.params;
-  const { message } = req.body;
+  const { message, type } = req.body;
 
   // Checks if the receiver exists
   try {
@@ -26,6 +26,7 @@ router.post("/create/:senderId/:receiverId", async (req, res) => {
       receiverId: receiverObjectId,
       senderId: senderObjectId,
       message: message,
+      type: type,
       timestamp: new Date(),
     };
 
@@ -33,6 +34,7 @@ router.post("/create/:senderId/:receiverId", async (req, res) => {
       receiverId: receiverObjectId,
       senderId: senderObjectId,
       message: message,
+      type: type,
       timestamp: new Date(),
     };
     //Checks if the receiver has the sender's contact else saves the sender's contact
@@ -57,7 +59,7 @@ router.post("/create/:senderId/:receiverId", async (req, res) => {
       receiver.chats.push(newChat);
     } else {
       // If chat session exists, push the new message to the existing chat
-      chat.messages.push(receiverMessage);
+      chat.messages.push(senderMessage);
     }
     await receiver.save();
 
@@ -67,8 +69,8 @@ router.post("/create/:senderId/:receiverId", async (req, res) => {
     chatSender.messages.push(senderMessage);
     await sender.save();
 
-    const io = getIo();
-    io.to(receiverId).emit("message", receiverMessage);
+    //const io = getIo();
+    //io.to(receiverId).emit("message", receiverMessage);
 
     res.status(200).json(senderMessage);
   } catch (error) {
@@ -89,6 +91,24 @@ router.get("/getmessages/:userId/:chatId", async (req, res) => {
       return res.status(404).json({ status: false, message: "Chat not found" });
     }
     res.status(200).json(chat.messages);
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+});
+
+router.delete("/delete/:userId/:chatId/:messageId", async (req, res) => {
+  const { userId, chatId, messageId } = req.params;
+  try {
+    const cId = new mongoose.Types.ObjectId(chatId);
+    const mId = new mongoose.Types.ObjectId(messageId);
+    const user = await User.findById(userId);
+    const chat = user.chats.find((c) => c._id && c._id.equals(cId));
+    const message = await chat.messages.findIndex(
+      (m) => m._id && m._id.equals(mId)
+    );
+    chat.messages.splice(message, 1);
+    await user.save();
+    res.status(200).json("message deleted...!");
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
   }

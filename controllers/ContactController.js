@@ -3,7 +3,7 @@ import User from "../models/User.js";
 export const addContact = async (req, res) => {
   try {
     const { userId } = req.params;
-    const { contactNum, username } = req.body;
+    const { contactNum } = req.body;
 
     // Find the user who is adding the contact
     const user = await User.findById(userId);
@@ -22,7 +22,7 @@ export const addContact = async (req, res) => {
     // Create a contact object with the contact's ID and username
     const contact = {
       contactId: contactUser._id,
-      username: username,
+      username: contactUser.username,
       email: contactUser.email,
       contact: contactUser.contact,
       member: contactUser._id,

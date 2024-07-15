@@ -49,12 +49,14 @@ export const loginUser = async (req, res) => {
     const isValidPassword = await bcrypt.compare(password, user.password);
 
     if (!user || !isValidPassword) {
-      return res.status(400).json("Invalid email or password..", error.message);
+      return res
+        .status(400)
+        .json({ message: "Invalid email or password.." + error.message });
     } else {
       const token = createJwt(res, user._id);
-      return res.status(201).json(user);
+      return res.status(201).json({ user, token });
     }
   } catch (error) {
-    res.status(400).json("An error occured " + error.message);
+    res.status(400).json({ message: "An error occured " + error.message });
   }
 };

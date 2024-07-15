@@ -24,7 +24,7 @@ export function initialize() {
     });
 
     socket.on("chat-message", (data) => {
-      //console.log(data);
+      console.log(data);
       const receiverSocketId = users[data.receiverId];
       if (receiverSocketId) {
         io.to(receiverSocketId).emit("getMessage", data);
