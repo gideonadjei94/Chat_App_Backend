@@ -1,14 +1,18 @@
 import mongoose from "mongoose";
 import { GridFSBucket } from "mongodb";
 import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
 
+dotenv.config();
 let gfs;
+let gfStories;
 export const dbConnection = async () => {
   try {
     mongoose.connect(process.env.MongoDb_URI);
     const db = mongoose.connection;
     db.once("open", () => {
       gfs = new GridFSBucket(db.db, { bucketName: "uploads" });
+      gfStories = new GridFSBucket(db.db, { bucketName: "stories" });
       console.log("MongoDB connected and GridFSBucket initialized");
     });
   } catch (error) {
@@ -16,7 +20,8 @@ export const dbConnection = async () => {
   }
 };
 export const getGFS = () => gfs;
-export default { dbConnection, getGFS };
+export const storiesGfs = () => gfStories;
+export default { dbConnection, getGFS, storiesGfs };
 
 //creation jwt Token
 export const createJwt = (res, userId) => {
