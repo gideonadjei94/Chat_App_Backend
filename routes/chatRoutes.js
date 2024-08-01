@@ -6,7 +6,7 @@ const router = express.Router();
 //to fetch userChats
 router.get("/getchats/:userId", async (req, res) => {
   const { userId } = req.params;
-  //const Id = new mongoose.Types.ObjectId(userId);
+  // const Id = new mongoose.Types.ObjectId(userId);
   const user = await User.findById(userId);
   try {
     const chats = await Promise.all(
